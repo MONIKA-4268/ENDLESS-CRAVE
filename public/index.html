@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ENDLESS CRAVE - Food Menu</title> 
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    :root {
+      --primary: #121111;
+      --text-light: #333;
+      --text-dark: #eee;
+      --card-bg-light: rgba(255, 255, 255, 0.85);
+      --card-bg-dark: rgba(40, 40, 40, 0.85);
+      --shadow-light: rgba(0, 0, 0, 0.2);
+      --shadow-dark: rgba(0, 0, 0, 0.4);
+    }
+    body {
+      font-family: 'Raleway', sans-serif;
+      background: rgb(10, 10, 10);
+      color: var(--text-light);
+      min-height: 100vh;
+      transition: all 0.5s ease;
+    }
+    body.dark {
+      background: black;
+      color: var(--text-dark);
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      backdrop-filter: blur(8px);
+      background: rgba(26, 26, 26, 0.8);
+      padding: 1rem 2rem;
+      border-bottom-left-radius: 20px;
+      border-bottom-right-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #fff;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    header .logo {
+      font-size: 1.6rem;
+      font-weight: 700;
+    }
+    header input {
+      max-width: 300px;
+      margin-left: 1rem;
+      padding: 0.5rem 1rem;
+      border-radius: 25px;
+      border: none;
+      font-size: 1rem;
+      outline: none;
+    }
+    .category-bar {
+      text-align: center;
+      margin: 1.5rem 0;
+    }
+    .category-btn {
+      display: inline-block;
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 25px;
+      margin: 0.2rem;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s ease, transform 0.3s;
+    }
+    .category-btn:hover,
+    .category-btn.active {
+      background: #191919;
+      transform: scale(1.1);
+    }
+    main {
+      padding: 2rem;
+    }
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 30px;
+    }
+    .menu-card {
+      background: var(--card-bg-light);
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      overflow: hidden;
+      box-shadow: 0 8px 25px var(--shadow-light);
+      transition: transform 0.5s ease, box-shadow 0.5s ease;
+    }
+    .menu-card:hover {
+      transform: translateY(-15px) scale(1.02);
+      box-shadow: 0 15px 35px var(--shadow-light);
+    }
+    .menu-card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+    .menu-card:hover img {
+      transform: scale(1.1);
+    }
+    .details {
+      padding: 1.2rem;
+      text-align: center;
+    }
+    .details h3 {
+      font-size: 1.4rem;
+      margin-bottom: 0.3rem;
+    }
+    .details .rating {
+      color: rgb(252, 215, 8);
+      margin-bottom: 0.5rem;
+    }
+    .details p {
+      font-weight: bold;
+      color: var(--primary);
+      margin-bottom: 1rem;
+      font-size: 1.2rem;
+    }
+    .details button {
+      background: var(--primary);
+      border: none;
+      color: rgb(239, 233, 233);
+      padding: 0.7rem 2rem;
+      border-radius: 30px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.4s ease, transform 0.4s;
+    }
+    .details button:hover {
+      background: #141414;
+      transform: scale(1.1);
+    }
+    #cart {
+      position: fixed;
+      top: 90px;
+      right: 20px;
+      background: black;
+      color: rgb(254, 252, 252);
+      padding: 1rem;
+      border-radius: 15px;
+      box-shadow: 0 8px 15px var(--shadow-light);
+      max-width: 270px;
+      max-height: 300px;
+      overflow-y: auto;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+    }
+    #cart h4 {
+      margin-bottom: 0.5rem;
+    }
+    #cart p {
+      font-size: 0.95rem;
+      margin-bottom: 0.4rem;
+    }
+    #cart-total {
+      font-weight: bold;
+      margin-top: 0.5rem;
+    }
+    #proceed-btn {
+      margin-top: 10px;
+      padding: 8px 14px;
+      background: green;
+      color: white;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .cart-bounce {
+      animation: bounce 0.3s;
+    }
+    @keyframes bounce {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+      100% { transform: scale(1); }
+    }
+    footer {
+      text-align: center;
+      font-size: 0.9rem;
+      color: #999;
+      padding: 1rem;
+      margin-top: 2rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">ENDLESS CRAVE</div>
+    <input type="text" id="search" placeholder="Search dishes..." />
+  </header>
+
+  <div class="category-bar">
+    <button class="category-btn active" data-category="all">All</button>
+    <button class="category-btn" data-category="snacks">Snacks</button>
+    <button class="category-btn" data-category="south">South Indian</button>
+    <button class="category-btn" data-category="fastfood">Fast Food</button>
+    <button class="category-btn" data-category="beverages">Beverages</button>
+    <button class="category-btn" data-category="dessert">Dessert</button>
+  </div>
+
+  <main>
+   <section class="menu-grid" id="menu">
+      <div class="menu-card" data-name="Burger" data-category="fastfood">
+  <img src="images/burger.jpg" alt="Burger">
+  <div class="details">
+    <h3>Burger</h3>
+    <div class="rating">⭐⭐⭐⭐</div>
+    <p>₹45</p>
+    <button onclick="addToCart('Burger', 45)">Order</button>
+  </div>
+</div>
+
+<!-- Chicken Biryani -->
+<div class="menu-card" data-name="Chicken Biryani" data-category="south">
+  <img src="images/chicken biriyani.jpeg" alt="Chicken Biryani">
+  <div class="details">
+    <h3>Chicken Biryani</h3>
+    <div class="rating">⭐⭐⭐⭐⭐</div>
+    <p>₹160</p>
+    <button onclick="addToCart('Chicken Biryani', 160)">Order</button>
+  </div>
+</div>
+
+<!-- Chicken Fried Rice -->
+<div class="menu-card" data-name="Chicken Fried Rice" data-category="south">
+  <img src="images/chicken fried rice.jpeg" alt="Chicken Fried Rice">
+  <div class="details">
+    <h3>Chicken Fried Rice</h3>
+    <div class="rating">⭐⭐⭐⭐</div>
+    <p>₹120</p>
+    <button onclick="addToCart('Chicken Fried Rice', 120)">Order</button>
+  </div>
+</div>
+
+<!-- Dosa -->
+<div class="menu-card" data-name="Dosa" data-category="south">
+  <img src="images/dosa.jpg" alt="Dosa">
+  <div class="details">
+    <h3>Dosa</h3>
+    <div class="rating">⭐⭐⭐⭐</div>
+    <p>₹40</p>
+    <button onclick="addToCart('Dosa', 40)">Order</button>
+  </div>
+</div>
+
+<!-- Fried Rice -->
+<div class="menu-card" data-name="Fried Rice" data-category="south">
+  <img src="images/fired rice.jpg" alt="Fried Rice">
+  <div class="details">
+    <h3>Fried Rice</h3>
+    <div class="rating">⭐⭐⭐</div>
+    <p>₹100</p>
+    <button onclick="addToCart('Fried Rice', 100)">Order</button>
+  </div>
+</div>
+
+<!-- Fried Chicken -->
+<div class="menu-card" data-name="Fried Chicken" data-category="fastfood">
+  <img src="images/fired chicken.jpg" alt="Fried Chicken">
+  <div class="details">
+    <h3>Fried Chicken</h3>
+    <div class="rating">⭐⭐⭐⭐</div>
+    <p>₹150</p>
+    <button onclick="addToCart('Fried Chicken', 150)">Order</button>
+  </div>
+</div>
+
+<!-- French Fries -->
+<div class="menu-card" data-name="French Fries" data-category="fastfood">
+  <img src="images/french fries.jpg" alt="French Fries">
+  <div class="details">
+    <h3>French Fries</h3>
+    <div class="rating">⭐⭐⭐</div>
+    <p>₹50</p>
+    <button onclick="addToCart('French Fries', 50)">Order</button>
+  </div>
+</div>
+
+<!-- Idly -->
+<div class="menu-card" data-name="Idly" data-category="south">
+  <img src="images/idly.jpg" alt="Idly">
+  <div class="details">
+    <h3>Idly</h3>
+    <div class="rating">⭐⭐⭐⭐</div>
+    <p>₹20</p>
+    <button onclick="addToCart('Idly', 20)">Order</button>
+  </div>
+</div>
+
+<!-- Kothu Parotta -->
+<div class="menu-card" data-name="Kothu Parotta" data-category="south">
+  <img src="images/kothu parotta.jpeg" alt="Kothu Parotta">
+  <div class="details">
+    <h3>Kothu Parotta</h3>
+    <div class="rating">⭐⭐⭐⭐</div>
+    <p>₹110</p>
+    <button onclick="addToCart('Kothu Parotta', 110)">Order</button>
+  </div>
+</div>
+
+<!-- Softy -->
+<div class="menu-card" data-name="Softy" data-category="Dessert">
+  <img src="images/softy.jpeg" alt="Softy">
+  <div class="details">
+    <h3>Softy</h3>
+    <div class="rating">⭐⭐⭐⭐</div>
+    <p>₹30</p>
+    <button onclick="addToCart('Softy', 30)">Order</button>
+  </div>
+</div>
+
+<!-- Paneer and Mushroom Fried Rice -->
+<div class="menu-card" data-name="Paneer and Mushroom Fried Rice" data-category="south">
+  <img src="images/paneer and mushroom fried rice.jpg" alt="Paneer & Mushroom Fried Rice">
+  <div class="details">
+    <h3>Paneer & Mushroom Fried Rice</h3>
+    <div class="rating">⭐⭐⭐⭐</div>
+    <p>₹140</p>
+    <button onclick="addToCart('Paneer & Mushroom Fried Rice', 140)">Order</button>
+  </div>
+</div>
+
+<!-- Mutton Biryani -->
+<div class="menu-card" data-name="Mutton Biryani" data-category="south">
+  <img src="images/mutton biriyani.jpeg" alt="Mutton Biryani">
+  <div class="details">
+    <h3>Mutton Biryani</h3>
+    <div class="rating">⭐⭐⭐⭐⭐</div>
+    <p>₹200</p>
+    <button onclick="addToCart('Mutton Biryani', 200)">Order</button>
+  </div>
+</div>
+
+<!-- Pani Poori -->
+<div class="menu-card" data-name="Pani Poori" data-category="snacks">
+  <img src="images/panipoori.jpg" alt="Pani Poori">
+  <div class="details">
+    <h3>Pani Poori</h3>
+    <div class="rating">⭐⭐⭐⭐</div>
+    <p>₹40</p>
+    <button onclick="addToCart('Pani Poori', 40)">Order</button>
+  </div>
+</div>
+
+<!-- Parotta -->
+<div class="menu-card" data-name="Parotta" data-category="south">
+  <img src="images/parotta.jpeg" alt="Parotta">
+  <div class="details">
+    <h3>Parotta</h3>
+    <div class="rating">⭐⭐⭐⭐</div>
+    <p>₹30</p>
+    <button onclick="addToCart('Parotta', 30)">Order</button>
+  </div>
+</div>
+
+<!-- Poori -->
+<div class="menu-card" data-name="Poori" data-category="south">
+  <img src="images/poori.jpg" alt="Poori">
+  <div class="details">
+    <h3>Poori</h3>
+    <div class="rating">⭐⭐⭐</div>
+    <p>₹35</p>
+    <button onclick="addToCart('Poori', 35)">Order</button>
+  </div>
+</div>
+
+<!-- Veg Puff -->
+<div class="menu-card" data-name="Veg Puff" data-category="snacks">
+  <img src="images/puff.jpg" alt="Veg Puff">
+  <div class="details">
+    <h3>Veg Puff</h3>
+    <div class="rating">⭐⭐⭐⭐</div>
+    <p>₹25</p>
+    <button onclick="addToCart('Veg Puff', 25)">Order</button>
+  </div>
+</div>
+
+<!-- Samosa -->
+<div class="menu-card" data-name="Samosa" data-category="snacks">
+  <img src="images/samosa.jpg" alt="Samosa">
+  <div class="details">
+    <h3>Samosa</h3>
+    <div class="rating">⭐⭐⭐⭐</div>
+    <p>₹20</p>
+    <button onclick="addToCart('Samosa', 20)">Order</button>
+  </div>
+</div>
+
+<!-- Veg Sandwich -->
+<div class="menu-card" data-name="Veg Sandwich" data-category="snacks">
+  <img src="images/sandwich.jpg" alt="Veg Sandwich">
+  <div class="details">
+    <h3>Veg Sandwich</h3>
+    <div class="rating">⭐⭐⭐</div>
+    <p>₹50</p>
+    <button onclick="addToCart('Veg Sandwich', 50)">Order</button>
+  </div>
+</div>
+
+<!-- Tea -->
+<div class="menu-card" data-name="Tea" data-category="beverages">
+  <img src="images/tea.jpg" alt="Tea">
+  <div class="details">
+    <h3>Tea</h3>
+    <div class="rating">⭐⭐⭐⭐</div>
+    <p>₹15</p>
+    <button onclick="addToCart('Tea', 15)">Order</button>
+  </div>
+</div>
+
+<!-- Watermelon Juice -->
+<div class="menu-card" data-name="Watermelon Juice" data-category="beverages">
+  <img src="images/watermelon.jpeg" alt="Watermelon Juice">
+  <div class="details">
+    <h3>Watermelon Juice</h3>
+    <div class="rating">⭐⭐⭐⭐</div>
+    <p>₹50</p>
+    <button onclick="addToCart('Watermelon Juice', 50)">Order</button>
+  </div>
+</div>
+
+<!-- Veg Wrap -->
+<div class="menu-card" data-name="Veg Wrap" data-category="fastfood">
+  <img src="images/wrap.jpg" alt="Veg Wrap">
+  <div class="details">
+    <h3>Veg Wrap</h3>
+    <div class="rating">⭐⭐⭐</div>
+    <p>₹60</p>
+    <button onclick="addToCart('Veg Wrap', 60)">Order</button>
+  </div>
+</div>
+
+<!-- Brownie -->
+<div class="menu-card" data-name="Brownie" data-category="dessert">
+  <img src="images/browine.jpeg" alt="Brownie">
+  <div class="details">
+    <h3>Brownie</h3>
+    <div class="rating">⭐⭐⭐⭐</div>
+    <p>₹70</p>
+    <button onclick="addToCart('Brownie', 70)">Order</button>
+  </div>
+</div>
+
+<!-- Chicken Sandwich -->
+<div class="menu-card" data-name="Chicken Sandwich" data-category="snacks">
+  <img src="images/chicken sandwich.jpeg" alt="Chicken Sandwich">
+  <div class="details">
+    <h3>Chicken Sandwich</h3>
+    <div class="rating">⭐⭐⭐⭐</div>
+    <p>₹80</p>
+    <button onclick="addToCart('Chicken Sandwich', 80)">Order</button>
+  </div>
+</div>
+
+<!-- Chicken Wrap -->
+<div class="menu-card" data-name="Chicken Wrap" data-category="fastfood">
+  <img src="images/chicken wrap.jpeg" alt="Chicken Wrap">
+  <div class="details">
+    <h3>Chicken Wrap</h3>
+    <div class="rating">⭐⭐⭐⭐</div>
+    <p>₹90</p>
+    <button onclick="addToCart('Chicken Wrap', 90)">Order</button>
+  </div>
+</div>
+
+<!-- Chocolate Cake -->
+<div class="menu-card" data-name="Chocolate Cake" data-category="dessert">
+  <img src="images/chocolate cake.jpeg" alt="Chocolate Cake">
+  <div class="details">
+    <h3>Chocolate Cake</h3>
+    <div class="rating">⭐⭐⭐⭐⭐</div>
+    <p>₹100</p>
+    <button onclick="addToCart('Chocolate Cake', 100)">Order</button>
+  </div>
+</div>
+
+<!-- Egg Puff -->
+<div class="menu-card" data-name="Egg Puff" data-category="snacks">
+  <img src="images/egg puff.jpeg" alt="Egg Puff">
+  <div class="details">
+    <h3>Egg Puff</h3>
+    <div class="rating">⭐⭐⭐⭐</div>
+    <p>₹30</p>
+    <button onclick="addToCart('Egg Puff', 30)">Order</button>
+  </div>
+</div>
+
+<!-- Momos -->
+<div class="menu-card" data-name="Momos" data-category="snacks">
+  <img src="images/momo.jpeg" alt="Momos">
+  <div class="details">
+    <h3>Momos</h3>
+    <div class="rating">⭐⭐⭐⭐</div>
+    <p>₹60</p>
+    <button onclick="addToCart('Momos', 60)">Order</button>
+  </div>
+</div>
+
+<!-- Pizza -->
+<div class="menu-card" data-name="Pizza" data-category="fastfood">
+  <img src="images/pizza.jpeg" alt="Pizza">
+  <div class="details">
+    <h3>Pizza</h3>
+    <div class="rating">⭐⭐⭐⭐⭐</div>
+    <p>₹150</p>
+    <button onclick="addToCart('Pizza', 150)">Order</button>
+  </div>
+</div>
+
+<!-- Red Velvet Dream Cake -->
+<div class="menu-card" data-name="Red Velvet Dream Cake" data-category="dessert">
+  <img src="images/red velvet dream cake.jpeg" alt="Red Velvet Dream Cake">
+  <div class="details">
+    <h3>Red Velvet Dream Cake</h3>
+    <div class="rating">⭐⭐⭐⭐⭐</div>
+    <p>₹120</p>
+    <button onclick="addToCart('Red Velvet Dream Cake', 120)">Order</button>
+ 
+        </div>
+      </div>
+    </div>
+    </section>
+  </main>
+
+  <div id="cart">
+    <h4>Your Cart</h4>
+    <div id="cart-items"></div>
+    <div id="cart-total">Total: ₹0</div>
+    <button id="proceed-btn" onclick="goToPayment()">Proceed to Payment</button>
+  </div>
+
+  <footer>
+    &copy; 2025 ENDLESS CRAVE. All rights reserved.
+  </footer>
+
+  <script src="payment.js" defer></script>
+  <script src="script.js" defer></script>
+
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      const searchInput = document.getElementById('search');
+      const cartItems = document.getElementById('cart-items');
+      const cartTotal = document.getElementById('cart-total');
+      const categoryButtons = document.querySelectorAll('.category-btn');
+      const menuCards = document.querySelectorAll('.menu-card');
+
+      let cart = {};
+
+      window.addToCart = function(name, price) {
+        const cartDiv = document.getElementById('cart');
+        cartDiv.classList.add('cart-bounce');
+        setTimeout(() => cartDiv.classList.remove('cart-bounce'), 300);
+
+        if (cart[name]) cart[name].qty++;
+        else cart[name] = { price, qty: 1 };
+
+        renderCart();
+      };
+
+      window.removeFromCart = function(name) {
+        if (cart[name]) {
+          if (cart[name].qty > 1) cart[name].qty--;
+          else delete cart[name];
+          renderCart();
+        }
+      };
+
+      function renderCart() {
+        cartItems.innerHTML = '';
+        let total = 0;
+        Object.keys(cart).forEach(item => {
+          const { price, qty } = cart[item];
+          cartItems.innerHTML += `
+            <p>${item} x ${qty} - ₹${price * qty}
+              <button onclick="removeFromCart('${item}')" style="margin-left:10px;background:red;color:white;border:none;padding:2px 6px;border-radius:4px;cursor:pointer;">X</button>
+            </p>`;
+          total += price * qty;
+        });
+        cartTotal.textContent = `Total: ₹${total}`;
+
+        // ✅ Save cart and total to localStorage
+        localStorage.setItem('cart', JSON.stringify(cart));
+        localStorage.setItem('total', total);
+      }
+
+      searchInput.addEventListener('input', () => {
+        const term = searchInput.value.toLowerCase();
+        menuCards.forEach(card => {
+          const name = card.dataset.name.toLowerCase();
+          card.style.display = name.includes(term) ? 'block' : 'none';
+        });
+      });
+
+      categoryButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const category = btn.dataset.category;
+          menuCards.forEach(card => {
+            const cardCategory = card.dataset.category;
+            card.style.display = (category === 'all' || cardCategory === category) ? 'block' : 'none';
+          });
+        });
+      });
+    });
+
+    function goToPayment() {
+      window.location.href = "payment.html";
+    }
+  </script>
+</body>
+</html>
