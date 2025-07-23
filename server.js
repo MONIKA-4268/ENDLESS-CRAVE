@@ -33,6 +33,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Routes
 app.use('/api/orders', orderRoutes);
+app.options('*', cors()); // Handle preflight requests
 
 // Health check route (optional, for debugging)
 app.get('/api/health', (req, res) => {
