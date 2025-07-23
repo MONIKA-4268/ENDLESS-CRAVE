@@ -5,10 +5,14 @@ import path, { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import orderRoutes from './routes/orderRoutes.js';
 import cors from 'cors';
+import morgan from 'morgan';
 
 // Load environment variables first
 dotenv.config();
 const app = express();
+
+// 📦 Logging incoming requests
+app.use(morgan('dev'));
 
 // ✅ Enable CORS for frontend access
 app.use(cors({
@@ -22,35 +26,42 @@ app.use(cors({
   credentials: true
 }));
 
-// Middleware
+// 🧠 Middleware for parsing request bodies
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Static files setup for ES Modules
+// 🗂 Static files setup for ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Routes
+// 📦 Routes
 app.use('/api/orders', orderRoutes);
+app.use(express.json()); // ⬅️ Required for POST JSON
 
-// Health check route (optional, for debugging)
+// 🩺 Health check route
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok' });
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Global error handler
+// 🚨 Global error handler
 app.use((err, req, res, next) => {
   console.error('❌ Server error:', err);
-  res.status(500).json({ message: '❌ Server error. Please try again later.' });
+  const statusCode = err.status || 500;
+  res.status(statusCode).json({
+    message: err.message || '❌ Server error. Please try again later.'
+  });
 });
 
-// MongoDB connection
-mongoose.connect(process.env.MONGODB_URI)
+// 🌱 Connect to MongoDB
+mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
   .then(() => console.log('✅ MongoDB connected'))
   .catch(err => console.error('❌ MongoDB connection error:', err));
 
-// Start the server
+// 🚀 Start the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);

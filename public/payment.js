@@ -28,17 +28,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const method = methodSelect.value;
     const card = document.getElementById('card')?.value?.trim() || '';
     const amountRaw = localStorage.getItem('total');
+    const cartRaw = localStorage.getItem('cart');
     const amount = Number(amountRaw);
 
-    if (!name || !method || isNaN(amount) || amount <= 0) {
+    // Validate
+    if (!name || !method || isNaN(amount) || amount <= 0 || !cartRaw) {
       alert("❗ Please fill all required fields with valid data.");
       return;
     }
 
+    const items = JSON.parse(cartRaw);
+
     const orderData = {
       customerName: name,
       amount,
-      paymentMethod: method
+      paymentMethod: method,
+      items
     };
 
     const paymentData = {
@@ -47,8 +52,13 @@ document.addEventListener('DOMContentLoaded', () => {
       amount
     };
 
+    // Debug logs
+    console.log("🧾 Sending orderData:", JSON.stringify(orderData, null, 2));
+console.log("💳 Sending paymentData:", JSON.stringify(paymentData, null, 2));
+
+
     try {
-      // 🔁 Submit order first
+      // Order submission
       const orderRes = await fetch('https://endless-crave.onrender.com/api/orders/submit-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -56,14 +66,15 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       const orderResult = await orderRes.json();
-      console.log("📦 Order response:", orderResult);
+      console.log("📦 Order response:", JSON.stringify(orderResult, null, 2));
+
 
       if (!orderRes.ok) {
         alert(`❌ Failed to place order: ${orderResult.error || "Unknown error"}`);
         return;
       }
 
-      // 💳 Submit payment next
+      // Payment submission
       const paymentRes = await fetch('https://endless-crave.onrender.com/api/payment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -85,6 +96,8 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (err) {
       console.error("❌ Error placing order:", err);
       alert("❌ Server error. Please try again later.");
+    console.log("🧾 Sending orderData:", JSON.stringify(orderData, null, 2));
+    console.log("💳 Sending paymentData:", JSON.stringify(paymentData, null, 2));
     }
   });
 });

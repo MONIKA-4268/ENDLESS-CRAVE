@@ -2,28 +2,20 @@ import express from 'express';
 import Order from '../models/order.js';
 
 const router = express.Router();
-
-// Create a new order
 router.post('/submit-order', async (req, res) => {
-  console.log('📬 New order received:', req.body);
-
   try {
-    const { name, email, items, total, paymentMethod } = req.body;
+    const { customerName, amount, paymentMethod, items } = req.body;
 
-    // Basic validation
-    if (!name || !email || !items || !total || !paymentMethod) {
-      return res.status(400).json({ error: 'Missing required order fields' });
+    if (!customerName || !amount || !paymentMethod || !items || items.length === 0) {
+      return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    const newOrder = new Order({ name, email, items, total, paymentMethod });
+    const newOrder = new Order({ customerName, amount, paymentMethod, items });
     await newOrder.save();
 
-    console.log('✅ Order saved:', newOrder);
-    res.status(201).json({ message: 'Order placed successfully!' });
+    res.status(201).json({ message: 'Order saved', orderId: newOrder._id });
   } catch (err) {
-    console.error('❌ Error saving order:', err);
-    res.status(500).json({ error: 'Failed to place order.' });
+    console.error("❌ Order saving error:", err);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
-
-export default router;
