@@ -10,6 +10,7 @@ import cors from 'cors';
 dotenv.config();
 const app = express();
 
+// ✅ Enable CORS for frontend access
 app.use(cors({
   origin: [
     'http://127.0.0.1:5500',
@@ -17,10 +18,9 @@ app.use(cors({
     'https://endless-crave.onrender.com'
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type'],
   credentials: true
 }));
-
-// ...then your other middleware and routes
 
 // Middleware
 app.use(express.json());
@@ -33,14 +33,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Routes
 app.use('/api/orders', orderRoutes);
-app.options('*', cors()); // Handle preflight requests
 
 // Health check route (optional, for debugging)
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
-// Global error handler (should be before app.listen)
+// Global error handler
 app.use((err, req, res, next) => {
   console.error('❌ Server error:', err);
   res.status(500).json({ message: '❌ Server error. Please try again later.' });
