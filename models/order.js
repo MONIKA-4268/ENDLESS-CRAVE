@@ -1,18 +1,20 @@
 import mongoose from 'mongoose';
 
 const orderSchema = new mongoose.Schema({
-  customerName: { type: String, required: true },
-  amount: { type: Number, required: true },
-  paymentMethod: { type: String, required: true },
+  customerName: String,
+  amount: Number,
+  paymentMethod: String,
   items: [
     {
-      name: { type: String, required: true },
-      quantity: { type: Number, required: true },
-      price: { type: Number, required: true }
+      name: String,
+      price: Number,
+      quantity: Number
     }
-  ]
-}, { timestamps: true });
+  ],
+  createdAt: {
+    type: Date,
+    default: Date.now
+  }
+});
 
-const Order = mongoose.model('Order', orderSchema);
-export default Order;
-
+export default mongoose.model('Order', orderSchema);

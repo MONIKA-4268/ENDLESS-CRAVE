@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
   const methodSelect = document.getElementById('method');
+  const paymentForm = document.getElementById('paymentForm');
 
   const sections = {
     upi: document.getElementById('upi-section'),
@@ -20,24 +21,33 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Submit form
-  document.getElementById('paymentForm').addEventListener('submit', async (e) => {
+  // Handle payment form submit
+  if (!paymentForm) {
+    console.error("❌ Form with ID 'paymentForm' not found.");
+    return;
+  }
+
+  paymentForm.addEventListener("submit", async function (e) {
     e.preventDefault();
 
-    const name = document.getElementById('name').value.trim();
+    const name = document.getElementById("name").value;
     const method = methodSelect.value;
-    const card = document.getElementById('card')?.value?.trim() || '';
-    const amountRaw = localStorage.getItem('total');
-    const cartRaw = localStorage.getItem('cart');
-    const amount = Number(amountRaw);
+    const card = document.getElementById("card-number")?.value || "";
+    const cartRaw = localStorage.getItem("cart");
 
-    // Validate
-    if (!name || !method || isNaN(amount) || amount <= 0 || !cartRaw) {
-      alert("❗ Please fill all required fields with valid data.");
+    if (!cartRaw) {
+      alert("Your cart is empty!");
       return;
     }
 
-    const items = JSON.parse(cartRaw);
+    const rawItems = JSON.parse(cartRaw);
+    const items = Object.keys(rawItems).map((itemName) => ({
+      name: itemName,
+      price: rawItems[itemName].price,
+      quantity: rawItems[itemName].qty
+    }));
+
+    const amount = items.reduce((total, item) => total + item.price * item.quantity, 0);
 
     const orderData = {
       customerName: name,
@@ -52,52 +62,31 @@ document.addEventListener('DOMContentLoaded', () => {
       amount
     };
 
-    // Debug logs
-    console.log("🧾 Sending orderData:", JSON.stringify(orderData, null, 2));
+console.log("🧾 Sending orderData:", JSON.stringify(orderData, null, 2));
 console.log("💳 Sending paymentData:", JSON.stringify(paymentData, null, 2));
 
-
     try {
-      // Order submission
-      const orderRes = await fetch('https://endless-crave.onrender.com/api/orders/submit-order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("https://endless-crave.onrender.com/api/orders/submit-order", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify(orderData)
       });
 
-      const orderResult = await orderRes.json();
-      console.log("📦 Order response:", JSON.stringify(orderResult, null, 2));
+      const result = await response.json();
+      console.log("📦 Order response:", result);
 
-
-      if (!orderRes.ok) {
-        alert(`❌ Failed to place order: ${orderResult.error || "Unknown error"}`);
-        return;
+      if (response.ok) {
+        alert("✅ Order placed successfully!");
+        localStorage.removeItem("cart");
+        window.location.href = "/";
+      } else {
+        alert("❌ Order failed: " + result.error);
       }
-
-      // Payment submission
-      const paymentRes = await fetch('https://endless-crave.onrender.com/api/payment', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(paymentData)
-      });
-
-      const paymentResult = await paymentRes.json();
-      console.log("💳 Payment response:", paymentResult);
-
-      if (!paymentRes.ok) {
-        alert(`❌ Payment failed: ${paymentResult.error || "Unknown error"}`);
-        return;
-      }
-
-      alert(paymentResult.message || `✅ Order placed successfully via ${method.toUpperCase()}!`);
-      localStorage.clear();
-      window.location.href = 'index.html';
-
-    } catch (err) {
-      console.error("❌ Error placing order:", err);
-      alert("❌ Server error. Please try again later.");
-    console.log("🧾 Sending orderData:", JSON.stringify(orderData, null, 2));
-    console.log("💳 Sending paymentData:", JSON.stringify(paymentData, null, 2));
+    } catch (error) {
+      console.error("❌ Network error:", error);
+      alert("❌ Something went wrong. Try again later.");
     }
   });
 });
