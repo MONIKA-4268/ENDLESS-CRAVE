@@ -1,24 +1,29 @@
+// routes/orderRoutes.js
 import express from 'express';
-import Order from '../models/order.js';
+import Order from '../models/Order.js'; // ✅ Correct path with .js extension if using ES modules
 
 const router = express.Router();
 
-// Create a new order
 router.post('/submit-order', async (req, res) => {
   try {
     const { customerName, amount, paymentMethod, items } = req.body;
 
-   console.log("🧾 Sending orderData:", JSON.stringify(orderData, null, 2));
-console.log("💳 Sending paymentData:", JSON.stringify(paymentData, null, 2));
+    if (!customerName || !amount || !paymentMethod || !items || items.length === 0) {
+      return res.status(400).json({ error: 'Missing required order fields' });
+    }
 
+    const newOrder = new Order({
+      customerName,
+      amount,
+      paymentMethod,
+      items,
+    });
 
-    const newOrder = new Order({ customerName, amount, paymentMethod, items });
     await newOrder.save();
-
-    res.status(201).json({ message: 'Order saved', orderId: newOrder._id });
-  } catch (err) {
-    console.error("❌ Order saving error:", err);
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(201).json({ message: 'Order stored successfully' });
+  } catch (error) {
+    console.error('❌ Error submitting order:', error);
+    res.status(500).json({ error: 'Server error' });
   }
 });
 

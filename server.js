@@ -7,62 +7,68 @@ import orderRoutes from './routes/orderRoutes.js';
 import cors from 'cors';
 import morgan from 'morgan';
 
-// Load environment variables first
+// Load environment variables from .env
 dotenv.config();
+
 const app = express();
 
-// 📦 Logging incoming requests
+// Logging middleware
 app.use(morgan('dev'));
 
-// ✅ Enable CORS for frontend access
+// Enable CORS for frontend (local + deployed)
 app.use(cors({
   origin: [
     'http://127.0.0.1:5500',
     'http://localhost:5500',
-    'https://endless-crave.onrender.com'
+    'https://endless-crave.onrender.com',
   ],
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type'],
-  credentials: true
 }));
 
-// 🧠 Middleware for parsing request bodies
+// Middleware to parse JSON and form data
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// 🗂 Static files setup for ES Modules
+// Static file handling for ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 app.use(express.static(path.join(__dirname, 'public')));
 
-// 📦 Routes
+// API routes
 app.use('/api/orders', orderRoutes);
-app.use(express.json()); // ⬅️ Required for POST JSON
 
-// 🩺 Health check route
+// Health check route
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// 🚨 Global error handler
+// Fallback route for unknown paths
+app.use((req, res, next) => {
+  res.status(404).json({ error: 'Route not found' });
+});
+
+// Global error handler
 app.use((err, req, res, next) => {
   console.error('❌ Server error:', err);
-  const statusCode = err.status || 500;
-  res.status(statusCode).json({
-    message: err.message || '❌ Server error. Please try again later.'
+  res.status(err.status || 500).json({
+    error: err.message || 'Internal Server Error',
   });
 });
 
-// 🌱 Connect to MongoDB
+// Connect to MongoDB and start the server
+const PORT = process.env.PORT || 3000;
+
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
-  useUnifiedTopology: true
+  useUnifiedTopology: true,
 })
-  .then(() => console.log('✅ MongoDB connected'))
-  .catch(err => console.error('❌ MongoDB connection error:', err));
-
-// 🚀 Start the server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-});
+  .then(() => {
+    console.log('✅ MongoDB connected');
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on http://localhost:${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error('❌ MongoDB connection error:', err);
+  });

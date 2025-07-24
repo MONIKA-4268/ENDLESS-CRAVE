@@ -10,18 +10,24 @@ document.addEventListener('DOMContentLoaded', () => {
     paypal: document.getElementById('paypal-section'),
   };
 
-  // Toggle payment method sections
-  methodSelect.addEventListener('change', () => {
-    const method = methodSelect.value;
-    for (const key in sections) {
-      sections[key].classList.add('hide');
-    }
-    if (sections[method]) {
-      sections[method].classList.remove('hide');
-    }
-  });
+  // 🧩 Toggle payment method sections
+  if (methodSelect) {
+    methodSelect.addEventListener('change', () => {
+      const method = methodSelect.value;
+      for (const key in sections) {
+        if (sections[key]) {
+          sections[key].classList.add('hide');
+        }
+      }
+      if (sections[method]) {
+        sections[method].classList.remove('hide');
+      }
+    });
+  } else {
+    console.error("❌ Select with ID 'method' not found.");
+  }
 
-  // Handle payment form submit
+  // 🧾 Handle payment form submit
   if (!paymentForm) {
     console.error("❌ Form with ID 'paymentForm' not found.");
     return;
@@ -30,8 +36,8 @@ document.addEventListener('DOMContentLoaded', () => {
   paymentForm.addEventListener("submit", async function (e) {
     e.preventDefault();
 
-    const name = document.getElementById("name").value;
-    const method = methodSelect.value;
+    const name = document.getElementById("name")?.value || "";
+    const method = methodSelect?.value || "";
     const card = document.getElementById("card-number")?.value || "";
     const cartRaw = localStorage.getItem("cart");
 
@@ -43,27 +49,27 @@ document.addEventListener('DOMContentLoaded', () => {
     const rawItems = JSON.parse(cartRaw);
     const items = Object.keys(rawItems).map((itemName) => ({
       name: itemName,
-      price: rawItems[itemName].price,
-      quantity: rawItems[itemName].qty
+      price: Number(rawItems[itemName].price),
+      quantity: Number(rawItems[itemName].qty),
     }));
 
     const amount = items.reduce((total, item) => total + item.price * item.quantity, 0);
 
     const orderData = {
-      customerName: name,
+      customerName: name.trim(),
       amount,
-      paymentMethod: method,
-      items
+      paymentMethod: method.trim(),
+      items,
     };
 
     const paymentData = {
-      name,
+      name: name.trim(),
       card,
-      amount
+      amount,
     };
 
-console.log("🧾 Sending orderData:", JSON.stringify(orderData, null, 2));
-console.log("💳 Sending paymentData:", JSON.stringify(paymentData, null, 2));
+    console.log("🧾 Sending orderData:", orderData);
+    console.log("💳 Sending paymentData:", paymentData);
 
     try {
       const response = await fetch("https://endless-crave.onrender.com/api/orders/submit-order", {
@@ -80,13 +86,13 @@ console.log("💳 Sending paymentData:", JSON.stringify(paymentData, null, 2));
       if (response.ok) {
         alert("✅ Order placed successfully!");
         localStorage.removeItem("cart");
-        window.location.href = "/";
+        window.location.href = "/"; // Redirect to homepage
       } else {
         alert("❌ Order failed: " + result.error);
       }
     } catch (error) {
       console.error("❌ Network error:", error);
-      alert("❌ Something went wrong. Try again later.");
+      alert("❌ Something went wrong. Please try again later.");
     }
   });
 });
