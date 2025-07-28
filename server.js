@@ -5,6 +5,7 @@ import path, { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import orderRoutes from './routes/orderRoutes.js';
 import cors from 'cors';
+import order from './models/Order.js';
 
 // Load environment variables from .env file
 dotenv.config();
