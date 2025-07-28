@@ -12,15 +12,15 @@ router.post('/submit-order', async (req, res) => {
       return res.status(400).json({ error: 'Missing required order fields' });
     }
 
-    const newOrder = new Order({
+    const neworder = new order({
       customerName,
       amount,
       paymentMethod,
       items,
     });
 
-    await newOrder.save();
-    res.status(201).json({ message: 'Order stored successfully' });
+    await neworder.save();
+    res.status(201).json({ message: 'order stored successfully' });
   } catch (error) {
     console.error('❌ Error submitting order:', error);
     res.status(500).json({ error: 'Server error' });
