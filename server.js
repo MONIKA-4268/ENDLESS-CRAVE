@@ -1,15 +1,16 @@
+// server.js
 import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import path, { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import cors from 'cors';
-import orderRoutes from './routes/orderRoutes.js'; // ✅ right here
+import orderRoutes from './routes/orderRoutes.js';
 
 dotenv.config();
 const app = express();
 
-// Morgan logging in development
+// Morgan logging (only in development)
 if (process.env.NODE_ENV !== 'production') {
   try {
     const morgan = await import('morgan');
@@ -19,7 +20,7 @@ if (process.env.NODE_ENV !== 'production') {
   }
 }
 
-// CORS setup
+// CORS configuration
 app.use(cors({
   origin: [
     'http://127.0.0.1:5500',
@@ -30,11 +31,11 @@ app.use(cors({
   allowedHeaders: ['Content-Type'],
 }));
 
-// Body parsing
+// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Static files
+// Serve static files
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 app.use(express.static(path.join(__dirname, 'public')));
@@ -42,6 +43,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Routes
 app.use('/api/orders', orderRoutes);
 
+// Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
@@ -51,13 +53,13 @@ app.all('*', (req, res) => {
   res.status(404).json({ error: `Route ${req.originalUrl} not found` });
 });
 
-// Error handler
+// Global error handler
 app.use((err, req, res, next) => {
   console.error('❌ Server error:', err);
   res.status(err.status || 500).json({ error: err.message || 'Internal Server Error' });
 });
 
-// Start server
+// Connect to MongoDB and start server
 const PORT = process.env.PORT || 3000;
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => {

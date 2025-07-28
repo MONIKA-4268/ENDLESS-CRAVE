@@ -1,23 +1,14 @@
-// order.js
+// models/order.js
 import mongoose from 'mongoose';
 
 const orderSchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' },
-  items: [
-    {
-      name: { type: String, required: true },
-      qty: { type: Number, required: true },
-    },
-  ],
-  paymentMethod: {
-    type: String,
-    enum: ['card', 'upi', 'cod', 'netbanking'],
-    required: true,
-  },
-  totalAmount: { type: Number, required: true },
-  status: { type: String, default: 'pending' },
-  createdAt: { type: Date, default: Date.now },
+  customerName: String,
+  amount: Number,
+  paymentMethod: String,
+  items: Array,
+}, {
+  timestamps: true
 });
 
-const Order = mongoose.model('order', orderSchema);
-export default Order;
+const Order = mongoose.model('Order', orderSchema);
+export default Order; // ✅ This is crucial
