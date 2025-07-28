@@ -12,7 +12,7 @@
       padding: 30px;
     }
 
-    .container {
+    .payment-container {
       max-width: 500px;
       margin: 0 auto;
       background-color: #111;
@@ -22,7 +22,7 @@
 
     label {
       display: block;
-      margin-top: 15px;
+      margin-top: 10px;
     }
 
     input, select {
@@ -58,68 +58,63 @@
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2>Checkout</h2>
+  <div class="payment-container">
+    <h2>Choose Payment Method</h2>
     <form id="paymentForm">
-      <label for="name">Your Name <span style="color:red">*</span>:</label>
-      <input type="text" id="name" required />
+      <label for="name">Full Name:</label>
+      <input type="text" id="name" placeholder="Your name" required />
 
-      <label for="method">Payment Method <span style="color:red">*</span>:</label>
+      <label for="method">Payment Method:</label>
       <select id="method" required>
-        <option value="">-- Select Method --</option>
+        <option value="">-- Select Payment Method --</option>
         <option value="upi">UPI</option>
         <option value="card">Credit / Debit Card</option>
+        <option value="cod">Cash on Delivery</option>
         <option value="netbanking">Net Banking</option>
         <option value="gpay">Google Pay</option>
         <option value="paypal">PayPal</option>
       </select>
 
-      <!-- UPI -->
       <div id="upi-section" class="hide">
         <label for="upi-id">UPI ID:</label>
         <input type="text" id="upi-id" placeholder="example@upi" />
       </div>
 
-      <!-- Card -->
       <div id="card-section" class="hide">
         <label for="card-number">Card Number:</label>
-        <input type="text" id="card-number" maxlength="16" placeholder="1234 5678 9012 3456" />
-        
-        <label for="expiry">Expiry (MM/YY):</label>
+        <input type="text" id="card-number" placeholder="0000 0000 0000 0000" maxlength="16" />
+        <label for="expiry">Expiry Date (MM/YY):</label>
         <input type="text" id="expiry" placeholder="MM/YY" />
-        
         <label for="cvv">CVV:</label>
-        <input type="password" id="cvv" maxlength="4" placeholder="123" />
+        <input type="password" id="cvv" placeholder="123" maxlength="4" />
       </div>
 
-      <!-- Net Banking -->
       <div id="netbanking-section" class="hide">
-        <label for="bank">Choose Bank:</label>
+        <label for="bank">Select Bank:</label>
         <select id="bank">
           <option value="">-- Select Bank --</option>
-          <option value="hdfc">HDFC</option>
           <option value="sbi">SBI</option>
-          <option value="icici">ICICI</option>
+          <option value="icici">ICICI Bank</option>
+          <option value="hdfc">HDFC Bank</option>
+          <option value="axis">Axis Bank</option>
         </select>
       </div>
 
-      <!-- GPay -->
       <div id="gpay-section" class="hide">
-        <label for="gpay-number">GPay Number:</label>
-        <input type="text" id="gpay-number" placeholder="Mobile Number" />
+        <label for="gpay-number">Google Pay Number:</label>
+        <input type="text" id="gpay-number" placeholder="10-digit mobile number" />
       </div>
 
-      <!-- PayPal -->
       <div id="paypal-section" class="hide">
         <label for="paypal-email">PayPal Email:</label>
-        <input type="email" id="paypal-email" placeholder="you@example.com" />
+        <input type="email" id="paypal-email" placeholder="your@email.com" />
       </div>
 
-      <button type="submit">Submit Payment</button>
-      <a href="index.html">← Back to Menu</a>
+      <button type="submit">Pay Now</button>
     </form>
+    <a href="index.html" class="back-link">← Back to Menu</a>
   </div>
 
-  <script src="payment.js"></script>
+  <script src="payment.js" defer></script>
 </body>
 </html>

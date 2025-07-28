@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     paypal: document.getElementById('paypal-section'),
   };
 
+  // 🧩 Toggle payment method sections
   if (methodSelect) {
     methodSelect.addEventListener('change', () => {
       const method = methodSelect.value;
@@ -22,15 +23,21 @@ document.addEventListener('DOMContentLoaded', () => {
         sections[method].classList.remove('hide');
       }
     });
+  } else {
+    console.error("❌ Element with ID 'method' not found.");
   }
 
-  if (!paymentForm) return;
+  // 🧾 Handle payment form submission
+  if (!paymentForm) {
+    console.error("❌ Form with ID 'paymentForm' not found.");
+    return;
+  }
 
   paymentForm.addEventListener("submit", async function (e) {
     e.preventDefault();
 
-    const name = document.getElementById("name")?.value.trim();
-    const method = methodSelect?.value;
+    const name = document.getElementById("name")?.value.trim() || "";
+    const method = methodSelect?.value.trim() || "";
     const card = document.getElementById("card-number")?.value.trim() || "";
     const cartRaw = localStorage.getItem("cart");
 
@@ -75,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify(orderData)
+       body: JSON.stringify(orderData)
       });
 
       const result = await response.json();
@@ -84,9 +91,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (response.ok) {
         alert("✅ Order placed successfully!");
         localStorage.removeItem("cart");
-        window.location.href = "index.html";
+        window.location.href = window.location.origin;
       } else {
-        alert("❌ Order failed: " + (result?.error || "Unknown error"));
+        alert("❌ Order failed: " + (result.error || "Unknown error"));
       }
     } catch (error) {
       console.error("❌ Network error:", error);
