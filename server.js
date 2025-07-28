@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 import path, { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import cors from 'cors';
-import { orderRoutes } from './routes/orderRoutes.js';
+import orderRoutes from './routes/orderRoutes.js'; // ✅ right here
 
 dotenv.config();
 const app = express();
