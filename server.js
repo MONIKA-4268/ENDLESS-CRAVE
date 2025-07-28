@@ -3,16 +3,15 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import path, { dirname } from 'path';
 import { fileURLToPath } from 'url';
-import orderRoutes from './routes/orderRoutes.js';
 import cors from 'cors';
-import Order from './models/order.js';
+import orderRoutes from './routes/orderRoutes.js';
 
-// Load environment variables from .env file
+// Load environment variables from .env
 dotenv.config();
 
 const app = express();
 
-// 🌐 Conditionally apply morgan logging only in non-production
+// Conditionally enable morgan logging in development
 if (process.env.NODE_ENV !== 'production') {
   try {
     const morgan = await import('morgan');
@@ -22,7 +21,7 @@ if (process.env.NODE_ENV !== 'production') {
   }
 }
 
-// 🤝 Enable CORS for both local and deployed frontends
+// Enable CORS
 app.use(cors({
   origin: [
     'http://127.0.0.1:5500',
@@ -33,42 +32,38 @@ app.use(cors({
   allowedHeaders: ['Content-Type'],
 }));
 
-// 📦 Middleware to parse JSON and URL-encoded form data
+// Parse JSON and URL-encoded data
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// 🗂️ Serve static files
+// Static file serving
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 app.use(express.static(path.join(__dirname, 'public')));
 
-// 🔗 Mount API routes
+// Routes
 app.use('/api/orders', orderRoutes);
 
-// 🩺 Health check route
+// Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// 🛑 Fallback route for unknown paths
-app.use((req, res, next) => {
+// 404 fallback
+app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
-// ❗ Global error handler
+// Global error handler
 app.use((err, req, res, next) => {
   console.error('❌ Server error:', err);
-  res.status(err.status || 500).json({
-    error: err.message || 'Internal Server Error',
-  });
+  res.status(err.status || 500).json({ error: err.message || 'Internal Server Error' });
 });
 
-// 🚀 Connect to MongoDB and start server
+// MongoDB + Server start
 const PORT = process.env.PORT || 3000;
-
 mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
+  useNewUrlParser: true
 })
   .then(() => {
     console.log('✅ MongoDB connected');
