@@ -1,6 +1,6 @@
 // routes/orderRoutes.js
 import express from 'express';
-import Order from '../models/Order.js'; // ✅ Correct path with .js extension if using ES modules
+import Order from '../models/order.js'; // ✅ Correct path with .js extension if using ES modules
 
 const router = express.Router();
 
