@@ -24,10 +24,10 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   } else {
-    console.error("❌ Select with ID 'method' not found.");
+    console.error("❌ Element with ID 'method' not found.");
   }
 
-  // 🧾 Handle payment form submit
+  // 🧾 Handle payment form submission
   if (!paymentForm) {
     console.error("❌ Form with ID 'paymentForm' not found.");
     return;
@@ -36,13 +36,18 @@ document.addEventListener('DOMContentLoaded', () => {
   paymentForm.addEventListener("submit", async function (e) {
     e.preventDefault();
 
-    const name = document.getElementById("name")?.value || "";
-    const method = methodSelect?.value || "";
-    const card = document.getElementById("card-number")?.value || "";
+    const name = document.getElementById("name")?.value.trim() || "";
+    const method = methodSelect?.value.trim() || "";
+    const card = document.getElementById("card-number")?.value.trim() || "";
     const cartRaw = localStorage.getItem("cart");
 
+    if (!name || !method) {
+      alert("❗ Please fill out all required fields.");
+      return;
+    }
+
     if (!cartRaw) {
-      alert("Your cart is empty!");
+      alert("🛒 Your cart is empty!");
       return;
     }
 
@@ -56,14 +61,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const amount = items.reduce((total, item) => total + item.price * item.quantity, 0);
 
     const orderData = {
-      customerName: name.trim(),
+      customerName: name,
       amount,
-      paymentMethod: method.trim(),
+      paymentMethod: method,
       items,
     };
 
     const paymentData = {
-      name: name.trim(),
+      name,
       card,
       amount,
     };
@@ -86,9 +91,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (response.ok) {
         alert("✅ Order placed successfully!");
         localStorage.removeItem("cart");
-        window.location.href = "/"; // Redirect to homepage
+        window.location.href = window.location.origin; // redirect to homepage
       } else {
-        alert("❌ Order failed: " + result.error);
+        alert("❌ Order failed: " + result.error || "Unknown error");
       }
     } catch (error) {
       console.error("❌ Network error:", error);
