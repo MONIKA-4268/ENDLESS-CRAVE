@@ -1,6 +1,7 @@
-const express = require('express');
+import express from 'express';
+import Order from '../models/order.js'; // ✅ Add ".js" extension for ES module resolution
+
 const router = express.Router();
-const Order = require('../models/order'); // ✅ Make sure schema matches merged fields
 
 router.post('/submit-order', async (req, res) => {
   try {
@@ -9,13 +10,8 @@ router.post('/submit-order', async (req, res) => {
     console.log('🧾 Received orderData:', orderData);
     console.log('💳 Received paymentData:', paymentData);
 
-    // Validate required fields
-    const {
-      customerName,
-      amount,
-      paymentMethod,
-      items
-    } = orderData || {};
+    // Validate required fields from orderData
+    const { customerName, amount, paymentMethod, items } = orderData || {};
 
     if (
       !customerName ||
@@ -27,7 +23,7 @@ router.post('/submit-order', async (req, res) => {
       return res.status(400).json({ error: 'Missing required order fields' });
     }
 
-    // Merge and create new order document
+    // Create new order document
     const newOrder = new Order({
       ...orderData,
       ...paymentData
@@ -36,9 +32,9 @@ router.post('/submit-order', async (req, res) => {
     const savedOrder = await newOrder.save();
     console.log('✅ Order saved:', savedOrder);
 
-    res.status(200).json({ success: true, order: savedOrder });
+    return res.status(200).json({ success: true, order: savedOrder });
   } catch (err) {
-    console.error('❌ Mongoose Validation Error:', err);
+    console.error('❌ Order submission error:', err);
 
     if (err.name === 'ValidationError') {
       const errors = {};
@@ -48,8 +44,8 @@ router.post('/submit-order', async (req, res) => {
       return res.status(400).json({ error: 'Validation failed', details: errors });
     }
 
-    res.status(500).json({ error: 'Internal Server Error' });
+    return res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
-module.exports = router;
+export default router;
