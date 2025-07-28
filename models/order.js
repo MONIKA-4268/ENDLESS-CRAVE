@@ -1,30 +1,20 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
 const orderSchema = new mongoose.Schema({
-  customerName: {
-    type: String,
-    required: true,
-    trim: true
-  },
-  amount: {
-    type: Number,
-    required: true
-  },
+  userId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' },
+  items: [{
+    name: { type: String, required: true },
+    qty: { type: Number, required: true }
+  }],
   paymentMethod: {
     type: String,
-    required: true,
-    enum: ['cod', 'upi', 'card'] // adjust as needed
+    enum: ['card', 'upi', 'cod', 'netbanking'],
+    required: true
   },
-  items: [
-    {
-      name: { type: String, required: true },
-      quantity: { type: Number, default: 1 }
-    }
-  ]
-}, {
-  timestamps: true
+  totalAmount: { type: Number, required: true },
+  status: { type: String, default: 'pending' },
+  createdAt: { type: Date, default: Date.now }
 });
 
-const Order = mongoose.model('order', orderSchema);
-
-export default Order;
+// ✅ lowercase 'order'
+module.exports = mongoose.model('order', orderSchema);

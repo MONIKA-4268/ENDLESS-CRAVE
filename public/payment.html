@@ -4,109 +4,71 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Payment - Endless Crave</title>
-  <link rel="stylesheet" href="style.css">
   <style>
     body {
-      background: #000;
-      color: #fff;
-      font-family: 'Raleway', sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 2rem;
+      background-color: black;
+      color: white;
+      font-family: Arial, sans-serif;
+      padding: 30px;
     }
 
-    .payment-container {
-      background: #121212;
-      padding: 2.5rem;
-      border-radius: 20px;
-      width: 100%;
+    .container {
       max-width: 500px;
-      box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
-    }
-
-    .payment-container h2 {
-      text-align: center;
-      margin-bottom: 1.5rem;
-      font-size: 1.8rem;
-      color: #fff;
-    }
-
-    .payment-container label {
-      display: block;
-      margin: 1rem 0 0.3rem;
-      font-weight: 600;
-    }
-
-    .payment-container input,
-    .payment-container select {
-      width: 100%;
-      padding: 0.75rem;
-      font-size: 1rem;
-      border: 1px solid #444;
-      background: #131313;
-      color: #fff;
+      margin: 0 auto;
+      background-color: #111;
+      padding: 20px;
       border-radius: 10px;
-      transition: border-color 0.3s ease;
     }
 
-    .payment-container input:focus,
-    .payment-container select:focus {
-      outline: none;
-      border-color: #181818;
+    label {
+      display: block;
+      margin-top: 15px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 5px;
+      border: none;
+      font-size: 1em;
     }
 
     .hide {
       display: none;
     }
 
-    .payment-container button {
-      width: 100%;
-      padding: 0.9rem;
-      background: #fff;
-      color: #000;
-      font-weight: bold;
+    button {
+      background-color: #eee;
       border: none;
-      border-radius: 12px;
+      padding: 10px 20px;
+      margin-top: 20px;
+      font-weight: bold;
+      border-radius: 5px;
       cursor: pointer;
-      font-size: 1.1rem;
-      margin-top: 1.5rem;
-      transition: background 0.3s ease, transform 0.2s ease;
     }
 
-    .payment-container button:hover {
-      background: #ddd;
-      transform: scale(1.03);
-    }
-
-    .back-link {
-      display: block;
-      margin-top: 1rem;
-      text-align: center;
-      color: #888;
+    a {
+      color: #ccc;
       text-decoration: none;
-      font-size: 0.9rem;
-    }
-
-    .back-link:hover {
-      color: #fff;
+      font-size: 0.9em;
+      display: block;
+      margin-top: 15px;
     }
   </style>
 </head>
 <body>
-  <div class="payment-container">
-    <h2>Choose Payment Method</h2>
+  <div class="container">
+    <h2>Checkout</h2>
     <form id="paymentForm">
-      <label for="customerName">Full Name:</label>
-      <input type="text" id="customerName" name="customerName" placeholder="Enter your name" required />
+      <label for="name">Your Name <span style="color:red">*</span>:</label>
+      <input type="text" id="name" required />
 
-      <label for="paymentMethod">Payment Method:</label>
-      <select id="paymentMethod" name="paymentMethod" required>
-        <option value="">-- Select Payment Method --</option>
+      <label for="method">Payment Method <span style="color:red">*</span>:</label>
+      <select id="method" required>
+        <option value="">-- Select Method --</option>
         <option value="upi">UPI</option>
         <option value="card">Credit / Debit Card</option>
-        <option value="cod">Cash on Delivery</option>
         <option value="netbanking">Net Banking</option>
         <option value="gpay">Google Pay</option>
         <option value="paypal">PayPal</option>
@@ -115,50 +77,49 @@
       <!-- UPI -->
       <div id="upi-section" class="hide">
         <label for="upi-id">UPI ID:</label>
-        <input type="text" id="upi-id" name="upiId" placeholder="example@upi" />
+        <input type="text" id="upi-id" placeholder="example@upi" />
       </div>
 
       <!-- Card -->
       <div id="card-section" class="hide">
         <label for="card-number">Card Number:</label>
-        <input type="text" id="card-number" name="cardNumber" placeholder="0000 0000 0000 0000" />
-
-        <label for="expiry">Expiry Date:</label>
-        <input type="text" id="expiry" name="expiry" placeholder="MM/YY" />
-
+        <input type="text" id="card-number" maxlength="16" placeholder="1234 5678 9012 3456" />
+        
+        <label for="expiry">Expiry (MM/YY):</label>
+        <input type="text" id="expiry" placeholder="MM/YY" />
+        
         <label for="cvv">CVV:</label>
-        <input type="password" id="cvv" name="cvv" placeholder="123" />
+        <input type="password" id="cvv" maxlength="4" placeholder="123" />
       </div>
 
       <!-- Net Banking -->
       <div id="netbanking-section" class="hide">
-        <label for="bank">Select Bank:</label>
-        <select id="bank" name="bank">
+        <label for="bank">Choose Bank:</label>
+        <select id="bank">
           <option value="">-- Select Bank --</option>
+          <option value="hdfc">HDFC</option>
           <option value="sbi">SBI</option>
-          <option value="icici">ICICI Bank</option>
-          <option value="hdfc">HDFC Bank</option>
-          <option value="axis">Axis Bank</option>
+          <option value="icici">ICICI</option>
         </select>
       </div>
 
-      <!-- Google Pay -->
+      <!-- GPay -->
       <div id="gpay-section" class="hide">
-        <label for="gpay-number">Google Pay Number:</label>
-        <input type="text" id="gpay-number" name="gpayNumber" placeholder="10-digit mobile number" />
+        <label for="gpay-number">GPay Number:</label>
+        <input type="text" id="gpay-number" placeholder="Mobile Number" />
       </div>
 
       <!-- PayPal -->
       <div id="paypal-section" class="hide">
         <label for="paypal-email">PayPal Email:</label>
-        <input type="email" id="paypal-email" name="paypalEmail" placeholder="your@email.com" />
+        <input type="email" id="paypal-email" placeholder="you@example.com" />
       </div>
 
-      <button type="submit">Pay Now</button>
+      <button type="submit">Submit Payment</button>
+      <a href="index.html">← Back to Menu</a>
     </form>
-    <a href="index.html" class="back-link">← Back to Menu</a>
   </div>
 
-  <script src="payment.js" defer></script>
+  <script src="payment.js"></script>
 </body>
 </html>
