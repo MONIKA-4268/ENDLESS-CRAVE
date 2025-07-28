@@ -98,11 +98,11 @@
   <div class="payment-container">
     <h2>Choose Payment Method</h2>
     <form id="paymentForm">
-      <label for="customerName">Full Name:</label>
-      <input type="text" id="customerName" name="customerName" placeholder="Enter your name" required />
+      <label for="name">Full Name:</label>
+      <input type="text" id="name" required />
 
-      <label for="paymentMethod">Payment Method:</label>
-      <select id="paymentMethod" name="paymentMethod" required>
+      <label for="method">Payment Method:</label>
+      <select id="method" required>
         <option value="">-- Select Payment Method --</option>
         <option value="upi">UPI</option>
         <option value="card">Credit / Debit Card</option>
@@ -115,25 +115,25 @@
       <!-- UPI -->
       <div id="upi-section" class="hide">
         <label for="upi-id">UPI ID:</label>
-        <input type="text" id="upi-id" name="upiId" placeholder="example@upi" />
+        <input type="text" id="upi-id" placeholder="example@upi" />
       </div>
 
       <!-- Card -->
       <div id="card-section" class="hide">
         <label for="card-number">Card Number:</label>
-        <input type="text" id="card-number" name="cardNumber" placeholder="0000 0000 0000 0000" />
+        <input type="text" id="card-number" placeholder="0000 0000 0000 0000" />
 
         <label for="expiry">Expiry Date:</label>
-        <input type="text" id="expiry" name="expiry" placeholder="MM/YY" />
+        <input type="text" id="expiry" placeholder="MM/YY" />
 
         <label for="cvv">CVV:</label>
-        <input type="password" id="cvv" name="cvv" placeholder="123" />
+        <input type="password" id="cvv" placeholder="123" />
       </div>
 
       <!-- Net Banking -->
       <div id="netbanking-section" class="hide">
         <label for="bank">Select Bank:</label>
-        <select id="bank" name="bank">
+        <select id="bank">
           <option value="">-- Select Bank --</option>
           <option value="sbi">SBI</option>
           <option value="icici">ICICI Bank</option>
@@ -145,13 +145,13 @@
       <!-- Google Pay -->
       <div id="gpay-section" class="hide">
         <label for="gpay-number">Google Pay Number:</label>
-        <input type="text" id="gpay-number" name="gpayNumber" placeholder="10-digit mobile number" />
+        <input type="text" id="gpay-number" placeholder="10-digit mobile number" />
       </div>
 
       <!-- PayPal -->
       <div id="paypal-section" class="hide">
         <label for="paypal-email">PayPal Email:</label>
-        <input type="email" id="paypal-email" name="paypalEmail" placeholder="your@email.com" />
+        <input type="email" id="paypal-email" placeholder="your@email.com" />
       </div>
 
       <button type="submit">Pay Now</button>
@@ -161,4 +161,4 @@
 
   <script src="payment.js" defer></script>
 </body>
-</html>
+</html>   this the code update it
